@@ -3,8 +3,19 @@ uuid = "3906f415-a8f0-4609-a73d-5d1e05a0db26"
 authors = ["Stefanos Carlström <stefanos.carlstrom@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+IOUtils = "6aa5b9b4-0a87-4d01-8444-b9736d377f28"
+IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
+
 [compat]
-julia = "1"
+julia = "1.6"
+IOUtils = "0.1"
+IntervalSets = "0.5"
+PrettyTables = "1.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

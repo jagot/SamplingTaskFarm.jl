@@ -27,8 +27,8 @@ using SamplingTaskFarm
 
 xs = StaticSampler(Float64, 0.0..1.0, 40, "datafile.txt")
 
-work_fun = x -> begin
-    println("Worker got sample: $x")
+work_fun = (i,x) -> begin
+    println("Worker got sample #$i: $x")
     sleep(0.5)
     sin(2π*x)
 end

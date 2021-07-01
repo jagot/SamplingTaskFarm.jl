@@ -91,7 +91,7 @@ function serve_tasks!(tasker::Tasker{XT,YT};
                         tasker.active_tasks[worker_id] = i
                         tasker.life_signs[worker_id] = now()
                         x = get_sample!(s, i)
-                        write(sock, NEW_TASK, x)
+                        write(sock, NEW_TASK, i, x)
                         @info "Worker #$(worker_id) asks for work, gets it" i x
                     end
                 end
@@ -166,20 +166,21 @@ function task_farm(fun::Function, sampler::AbstractSampler{XT,YT};
 
                 while true
                     horizontal_line(color=:green)
-                    x = connect(port) do client
+                    ix = connect(port) do client
                         write(client, NEW_TASK, worker_id)
                         response = read(client, Magic)
                         @info "Requested work" response
                         if response == NEW_TASK
-                            read(client, XT)
+                            read(client, Int), read(client, XT)
                         elseif response == FINISHED
                             @info "We must go home"
                         end
                     end
-                    isnothing(x) && break
+                    isnothing(ix) && break
 
-                    @info "We are asked to work" x
-                    y = fun(x)
+                    i,x = ix
+                    @info "We are asked to work" i x
+                    y = fun(i, x)
 
                     connect(port) do client
                         write(client, RESULT, worker_id, x, y)

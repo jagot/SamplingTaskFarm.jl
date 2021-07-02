@@ -15,11 +15,10 @@ function load_samples!(s::AbstractSampler{<:Any,YT}) where YT
             nc == expected ||
                 throw(ArgumentError("Unexpected number of columns in $(s.filename), expected $(expected)"))
             xn = min(length(s.x), n)
-            xn == 0 || s.x[done] ≈ data[:,1] ||
-                throw(ArgumentError("Data stored in $(s.filename) does not match corresponding entries of x, delete file and try again"))
             xn < n &&
                 throw(ArgumentError("More data stored ($(n)) than sampler supports ($(xn))"))
 
+            s.x[done] = data[:,1]
             s.y[done] = (YT <: Complex ?
                 (data[:,2] + im*data[:,3]) :
                 data[:,2])

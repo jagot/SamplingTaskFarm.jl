@@ -128,11 +128,15 @@ function serve_tasks!(tasker::Tasker{XT,YT};
 end
 
 function task_farm(fun::Function, sampler::AbstractSampler{XT,YT};
-                   port=2000,
+                   host=localhost, port=2000,
                    alive_sleep=60, alive_threshold=3alive_sleep,
                    kwargs...) where {XT,YT}
     server = try
-        listen(port)
+        if host == localhost || hostname() == host
+            listen(host == localhost ? localhost : IPv4(0), port)
+        else
+            nothing
+        end
     catch IOError
         nothing
     end
@@ -143,7 +147,7 @@ function task_farm(fun::Function, sampler::AbstractSampler{XT,YT};
         serve_tasks!(tasker; kwargs...)
     else
         @info "We are a measly worker"
-        worker_id = connect(port) do client
+        worker_id = connect(host, port) do client
             write(client, NEW_WORKER)
             response = read(client, Magic)
             if response == NEW_WORKER
@@ -166,7 +170,7 @@ function task_farm(fun::Function, sampler::AbstractSampler{XT,YT};
 
                 while true
                     horizontal_line(color=:green)
-                    ix = connect(port) do client
+                    ix = connect(host, port) do client
                         write(client, NEW_TASK, worker_id)
                         response = read(client, Magic)
                         @info "Requested work" response
@@ -182,7 +186,7 @@ function task_farm(fun::Function, sampler::AbstractSampler{XT,YT};
                     @info "We are asked to work" i x
                     y = fun(i, x)
 
-                    connect(port) do client
+                    connect(host, port) do client
                         write(client, RESULT, worker_id, x, y)
                     end
                 end
